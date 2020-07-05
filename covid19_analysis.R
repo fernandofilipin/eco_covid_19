@@ -13,9 +13,9 @@
 {
   usethis::use_git_config(user.name = "fernando filipin", # full name
                           user.email = "ra109186@uem.br") # Semail
-  usethis::browse_github_token()
+  usethis::browse_github_token ()
   
-  GITHUB_PAT= "R:GITHUB_PAT"
+  GITHUB_PAT= "96f7666a8cf58ede339dfe60e8507aa54347ae30"
   
 } # git information
 
@@ -70,6 +70,7 @@
   
 } # database by city
 
+ggplot()
 {
   ## Import COVID cities database
   
@@ -86,6 +87,20 @@
   dcovid19sy = read_delim(gzfile(tmp), ";", escape_double = FALSE, 
                           locale = locale(decimal_mark = ",", grouping_mark = ".", 
                                           encoding = "ISO-8859-1"), trim_ws = TRUE)
+  dtest= dcovid19sy %>% ungroup()  %>% mutate(estado,"PARANÃ") %>% select(dataNotificacao,
+                                                                          sintomas,
+                                                                          estadoTeste,
+                                                                          dataTeste,
+                                                                          tipoTeste,
+                                                                          resultadoTeste,
+                                                                          sexo,
+                                                                          estado,
+                                                                          municipio,
+                                                                          municipioIBGE,
+                                                                          municipioNotificacao,
+                                                                          idade,
+                                                                          dataEncerramento,
+                                                                          evolucaoCaso) 
   
 } # database by individual cases
 
