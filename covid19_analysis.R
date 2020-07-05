@@ -41,13 +41,13 @@
     mutate(select = case_when(city_ibge_code == 4104808 ~ "Cascavel",
                               city_ibge_code == 4105805 ~ "Colombo",
                               city_ibge_code == 4106902 ~ "Curitiba",
-                              city_ibge_code == 4108304 ~ "Foz do Igua?u",
+                              city_ibge_code == 4108304 ~ "Foz do Iguacu",
                               city_ibge_code == 4109401 ~ "Guarapuava",
                               city_ibge_code == 4113700 ~ "Londrina",
-                              city_ibge_code == 4115200 ~ "Maring?",
-                              city_ibge_code == 4118204 ~ "Paranagu?",
+                              city_ibge_code == 4115200 ~ "Maringa",
+                              city_ibge_code == 4118204 ~ "Paranagua",
                               city_ibge_code == 4119905 ~ "Ponta Grossa",
-                              city_ibge_code == 4125506 ~ "S?o Jos? dos Pinhais",
+                              city_ibge_code == 4125506 ~ "Sao Jose dos Pinhais",
                               TRUE ~ "Outras cidades")) %>%
     arrange(desc(date)) %>%
     group_by(date, select) %>%
@@ -64,13 +64,17 @@
                                confirmed_new = confirmed - confirmed_1) %>%
     ungroup() %>% select(date, select, confirmed, confirmed_new, deaths, deaths_new) %>% 
     arrange(desc(date))
+
   
   # Drop unnecessary databases
   remove(list = c("dcovid19", "tmp", "url"))  
   
 } # database by city
 
-ggplot()
+{
+  
+}
+
 {
   ## Import COVID cities database
   
@@ -87,20 +91,28 @@ ggplot()
   dcovid19sy = read_delim(gzfile(tmp), ";", escape_double = FALSE, 
                           locale = locale(decimal_mark = ",", grouping_mark = ".", 
                                           encoding = "ISO-8859-1"), trim_ws = TRUE)
-  dtest= dcovid19sy %>% ungroup()  %>% mutate(estado,"PARANÃ") %>% select(dataNotificacao,
-                                                                          sintomas,
-                                                                          estadoTeste,
-                                                                          dataTeste,
-                                                                          tipoTeste,
-                                                                          resultadoTeste,
-                                                                          sexo,
-                                                                          estado,
-                                                                          municipio,
-                                                                          municipioIBGE,
-                                                                          municipioNotificacao,
-                                                                          idade,
-                                                                          dataEncerramento,
-                                                                          evolucaoCaso) 
+  
+  # Organize dcovidpr database
+  
+  dcovidpr= dcovid19sy %>% ungroup()  %>% mutate(estado,"PARANA") %>% 
+    subset(estadoTeste=="ConcluÃ­do")%>%
+    select(dataNotificacao, dataInicioSintomas, sintomas, dataTeste, tipoTeste, resultadoTeste, sexo, municipio, municipioIBGE, municipioNotificacao, idade, dataEncerramento, evolucaoCaso)
+  
+  
+  dcovidpr = dcovidpr  %>% 
+    mutate(dataNotificacao = as.Date(dataNotificacao, format = "%Y-%m-%d")) %>%
+    mutate(dataTeste = as.Date(dataTeste, format = "%Y-%m-%d")) %>%
+    mutate(dataEncerramento = as.Date(dataEncerramento, format = "%Y-%m-%d")) %>%
+    mutate(dataInicioSintomas = as.Date(dataInicioSintomas, format = "%Y-%m-%d")) %>%
+    group_by(dataNotificacao) %>% 
+    arrange(dataNotificacao) %>% 
+        mutate(dias = dataEncerramento - dataInicioSintomas)
+  
+  
+  dpositivo = dcovidpr %>%
+    subset(resultadoTeste=="Positivo")
+  # Drop unnecessary databases
+  remove(list = c("dcovid19sy", "tmp", "url"))
   
 } # database by individual cases
 
